@@ -1,4 +1,4 @@
-package com.maciejak.myplaces_server.controllers.auth;
+package com.maciejak.myplaces_server.controllers;
 
 import com.maciejak.myplaces_server.MyPlacesServerApplication;
 import com.maciejak.myplaces_server.api.dto.request.RegistrationRequest;

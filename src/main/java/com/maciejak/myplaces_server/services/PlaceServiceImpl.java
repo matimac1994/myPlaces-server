@@ -2,17 +2,14 @@ package com.maciejak.myplaces_server.services;
 
 import com.maciejak.myplaces_server.api.dto.request.AddPlaceRequest;
 import com.maciejak.myplaces_server.api.dto.request.EditPlaceRequest;
-import com.maciejak.myplaces_server.api.dto.request.PlaceIdsRequest;
+import com.maciejak.myplaces_server.api.dto.request.IdsRequest;
 import com.maciejak.myplaces_server.api.dto.response.AddPlaceResponse;
 import com.maciejak.myplaces_server.api.dto.response.PlaceMapResponse;
 import com.maciejak.myplaces_server.api.dto.response.PlaceListResponse;
 import com.maciejak.myplaces_server.api.dto.response.PlaceResponse;
 import com.maciejak.myplaces_server.api.mappers.PlaceMapper;
 import com.maciejak.myplaces_server.entity.Place;
-import com.maciejak.myplaces_server.exception.place.PlaceNotFoundException;
-import com.maciejak.myplaces_server.exception.place.PlaceIsAlreadyArchivedException;
-import com.maciejak.myplaces_server.exception.place.PlaceIsNotArchivedException;
-import com.maciejak.myplaces_server.exception.place.WrongPlaceCoordinatesException;
+import com.maciejak.myplaces_server.exception.place.*;
 import com.maciejak.myplaces_server.repositories.PlaceRepository;
 import com.maciejak.myplaces_server.utils.MapPhotoUtil;
 import org.springframework.stereotype.Service;
@@ -67,7 +64,12 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Override
     public PlaceResponse getPlaceById(Long placeId) {
-        return convertToPlaceResponse(placeRepository.findById(placeId));
+        Place place = placeRepository.findById(placeId);
+        if (place == null){
+            throw new PlaceNotFoundException();
+        }
+
+        return convertToPlaceResponse(place);
     }
 
     @Override
@@ -126,15 +128,20 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
-    public void restorePlaces(PlaceIdsRequest placeIdsRequest) {
-        for (Long id : placeIdsRequest.getPlaceIds()){
-            restorePlace(id);
+    public void restorePlaces(IdsRequest idsRequest) {
+        if(idsRequest.getIds() != null){
+            for (Long id : idsRequest.getIds()){
+                restorePlace(id);
+            }
+        } else {
+            throw new EmptyPlaceIdsException();
         }
+
     }
 
     @Override
-    public void deletePlaces(PlaceIdsRequest placeIdsRequest) {
-        for (Long id : placeIdsRequest.getPlaceIds()){
+    public void deletePlaces(IdsRequest idsRequest) {
+        for (Long id : idsRequest.getIds()){
             deletePlace(id);
         }
     }

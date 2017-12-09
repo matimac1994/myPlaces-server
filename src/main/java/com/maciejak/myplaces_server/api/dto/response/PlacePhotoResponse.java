@@ -2,16 +2,16 @@ package com.maciejak.myplaces_server.api.dto.response;
 
 public class PlacePhotoResponse {
 
-    Long id;
-    String image;
-    Long placeId;
+    private Long id;
+    private String photoUrl;
+    private Long placeId;
 
     public PlacePhotoResponse() {
     }
 
-    public PlacePhotoResponse(Long id, String image, Long placeId) {
+    public PlacePhotoResponse(Long id, String photoUrl, Long placeId) {
         this.id = id;
-        this.image = image;
+        this.photoUrl = photoUrl;
         this.placeId = placeId;
     }
 
@@ -23,12 +23,12 @@ public class PlacePhotoResponse {
         this.id = id;
     }
 
-    public String getImage() {
-        return image;
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 
     public Long getPlaceId() {

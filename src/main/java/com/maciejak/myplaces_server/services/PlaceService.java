@@ -2,7 +2,7 @@ package com.maciejak.myplaces_server.services;
 
 import com.maciejak.myplaces_server.api.dto.request.AddPlaceRequest;
 import com.maciejak.myplaces_server.api.dto.request.EditPlaceRequest;
-import com.maciejak.myplaces_server.api.dto.request.PlaceIdsRequest;
+import com.maciejak.myplaces_server.api.dto.request.IdsRequest;
 import com.maciejak.myplaces_server.api.dto.response.AddPlaceResponse;
 import com.maciejak.myplaces_server.api.dto.response.PlaceMapResponse;
 import com.maciejak.myplaces_server.api.dto.response.PlaceListResponse;
@@ -34,9 +34,9 @@ public interface PlaceService {
 
     void restorePlace(Long placeId);
 
-    void restorePlaces(PlaceIdsRequest placeIdsRequest);
+    void restorePlaces(IdsRequest idsRequest);
 
-    void deletePlaces(PlaceIdsRequest placeIdsRequest);
+    void deletePlaces(IdsRequest idsRequest);
 
     void archivePlace(Long placeId);
 }
