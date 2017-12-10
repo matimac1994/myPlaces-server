@@ -5,6 +5,7 @@ import com.maciejak.myplaces_server.api.dto.response.RegistrationResponse;
 import com.maciejak.myplaces_server.entity.User;
 import com.maciejak.myplaces_server.exception.user.EmailAlreadyExistException;
 import com.maciejak.myplaces_server.exception.user.NotTheSamePasswordException;
+import com.maciejak.myplaces_server.exception.user.UserNotFoundException;
 import com.maciejak.myplaces_server.exception.user.UsernameAlreadyExistException;
 import com.maciejak.myplaces_server.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,10 +30,19 @@ public class UserServiceImpl implements UserService {
         validate(registrationRequest);
 
         User user = userRepository.save(new User(registrationRequest.getUsername(),
-                registrationRequest.getEmail(),
-                passwordEncoder.encode(registrationRequest.getPassword())));
+                registrationRequest.getEmail(),registrationRequest.getPassword()));
         registrationResponse.setUserId(user.getId());
         return registrationResponse;
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user == null){
+            throw new UserNotFoundException();
+        }
+
+        return user;
     }
 
     private void validate(RegistrationRequest registrationRequest){

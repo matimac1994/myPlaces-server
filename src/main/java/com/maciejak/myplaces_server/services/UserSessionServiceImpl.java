@@ -6,6 +6,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -17,9 +18,11 @@ import javax.servlet.http.HttpServletResponse;
 public class UserSessionServiceImpl implements UserSessionService {
 
     private AuthenticationManager authenticationManager;
+    private PasswordEncoder passwordEncoder;
 
-    public UserSessionServiceImpl(AuthenticationManager authenticationManager) {
+    public UserSessionServiceImpl(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -27,15 +30,9 @@ public class UserSessionServiceImpl implements UserSessionService {
         String username = loginRequest.getUsername();
         String password = loginRequest.getPassword();
 
-        validate(username, password);
-
         String token = authenticateUser(username, password);
 
         return new LoginResponse(token);
-    }
-
-    private void validate(String username, String password){
-        //TODO fill validate
     }
 
     private String authenticateUser(String username, String password){

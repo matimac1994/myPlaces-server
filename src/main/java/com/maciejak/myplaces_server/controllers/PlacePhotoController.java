@@ -5,12 +5,14 @@ import com.maciejak.myplaces_server.api.dto.request.IdsRequest;
 import com.maciejak.myplaces_server.api.dto.response.PlacePhotoResponse;
 import com.maciejak.myplaces_server.services.PlacePhotoService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping(MyPlacesServerApplication.BASE_URL + "/photos")
+@PreAuthorize("isAuthenticated()")
 public class PlacePhotoController {
 
     private PlacePhotoService placePhotoService;

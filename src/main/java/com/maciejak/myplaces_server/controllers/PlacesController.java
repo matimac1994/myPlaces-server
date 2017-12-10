@@ -9,12 +9,14 @@ import com.maciejak.myplaces_server.api.dto.response.PlaceMapResponse;
 import com.maciejak.myplaces_server.api.dto.response.PlaceResponse;
 import com.maciejak.myplaces_server.services.PlaceService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/myplaces")
+@PreAuthorize("isAuthenticated()")
 public class PlacesController {
 
     private PlaceService placeService;

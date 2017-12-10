@@ -7,6 +7,7 @@ import com.maciejak.myplaces_server.services.UserService;
 import com.maciejak.myplaces_server.services.UserSessionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +35,7 @@ public class UserSessionController {
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("isAuthenticated()")
     public void logout(HttpServletRequest request, HttpServletResponse response){
         userSessionService.logout(request, response);
     }
