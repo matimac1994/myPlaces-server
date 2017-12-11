@@ -9,9 +9,12 @@ import com.maciejak.myplaces_server.api.dto.response.PlaceListResponse;
 import com.maciejak.myplaces_server.api.dto.response.PlaceResponse;
 import com.maciejak.myplaces_server.api.mappers.PlaceMapper;
 import com.maciejak.myplaces_server.entity.Place;
+import com.maciejak.myplaces_server.entity.User;
 import com.maciejak.myplaces_server.exception.place.*;
 import com.maciejak.myplaces_server.repositories.PlaceRepository;
+import com.maciejak.myplaces_server.repositories.UserRepository;
 import com.maciejak.myplaces_server.utils.MapPhotoUtil;
+import com.maciejak.myplaces_server.utils.PrincipalProvider;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,32 +24,42 @@ import java.util.stream.Collectors;
 @Service
 public class PlaceServiceImpl implements PlaceService {
 
-    private  PlaceMapper placeMapper;
+    private PlaceMapper placeMapper;
     private PlaceRepository placeRepository;
+    private UserRepository userRepository;
 
-    public PlaceServiceImpl(PlaceMapper placeMapper, PlaceRepository placeRepository) {
+    public PlaceServiceImpl(PlaceMapper placeMapper, PlaceRepository placeRepository, UserRepository userRepository) {
         this.placeMapper = placeMapper;
         this.placeRepository = placeRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     public List<PlaceResponse> getAllPlaces() {
-        return fillListOfPlaceResponse(placeRepository.findAll());
+        User u = PrincipalProvider.getUserEntity();
+        User user = userRepository.findOne(u.getId());
+        return fillListOfPlaceResponse(user.getPlaces());
     }
 
     @Override
     public List<PlaceResponse> getAllActivePlaces() {
-        return fillListOfPlaceResponse(placeRepository.findAllActive());
+        User u = PrincipalProvider.getUserEntity();
+        User user = userRepository.findOne(u.getId());
+        return fillListOfPlaceResponse(user.getActivePlaces());
     }
 
     @Override
     public List<PlaceResponse> getAllArchivedPlaces() {
-        return fillListOfPlaceResponse(placeRepository.findAllArchived());
+        User u = PrincipalProvider.getUserEntity();
+        User user = userRepository.findOne(u.getId());
+        return fillListOfPlaceResponse(user.getArchivePlaces());
     }
 
     @Override
     public List<PlaceMapResponse> getAllMapPlaces() {
-        return placeRepository.findAllActive()
+        User u = PrincipalProvider.getUserEntity();
+        User user = userRepository.findOne(u.getId());
+        return user.getActivePlaces()
                 .stream()
                 .map(placeMapper::placeToMapPlaceResponse)
                 .collect(Collectors.toList());
@@ -54,12 +67,16 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Override
     public List<PlaceListResponse> getAllActivePlacesList() {
-        return fillListOfPlaceListResponse(placeRepository.findAllActive());
+        User u = PrincipalProvider.getUserEntity();
+        User user = userRepository.findOne(u.getId());
+        return fillListOfPlaceListResponse(user.getActivePlaces());
     }
 
     @Override
     public List<PlaceListResponse> getAllArchivedPlaceList() {
-        return fillListOfPlaceListResponse(placeRepository.findAllArchived());
+        User u = PrincipalProvider.getUserEntity();
+        User user = userRepository.findOne(u.getId());
+        return fillListOfPlaceListResponse(user.getArchivePlaces());
     }
 
     @Override
@@ -76,12 +93,15 @@ public class PlaceServiceImpl implements PlaceService {
     public AddPlaceResponse addPlace(AddPlaceRequest addPlaceRequest) {
         AddPlaceResponse addPlaceResponse = new AddPlaceResponse();
 
+        User user = PrincipalProvider.getUserEntity();
+
         if (addPlaceRequest.getLatitude() == null || addPlaceRequest.getLongitude() == null){
             throw new WrongPlaceCoordinatesException();
         }
 
         Place place = placeMapper.addPlaceRequestToPlace(addPlaceRequest);
         place.setCreatedAt(System.currentTimeMillis());
+        place.setUser(user);
         Place createdPlace = placeRepository.save(place);
 
         addPlaceResponse.setId(createdPlace.getId());

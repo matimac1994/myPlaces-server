@@ -5,6 +5,7 @@ import lombok.Data;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class User {
@@ -22,7 +23,7 @@ public class User {
     @Column
     String password;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user")
     List<Place> places;
 
     public User() {
@@ -68,6 +69,14 @@ public class User {
 
     public List<Place> getPlaces() {
         return places;
+    }
+
+    public List<Place> getActivePlaces() {
+        return places.stream().filter(place -> place.getDeletedAt() == null).collect(Collectors.toList());
+    }
+
+    public List<Place> getArchivePlaces() {
+        return places.stream().filter(place -> place.getDeletedAt() != null).collect(Collectors.toList());
     }
 
     public void setPlaces(List<Place> places) {

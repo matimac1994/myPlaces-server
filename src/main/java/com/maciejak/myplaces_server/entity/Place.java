@@ -36,7 +36,7 @@ public class Place {
     @Column
     Long deletedAt;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "place")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "place")
     List<PlacePhoto> photos;
 
     @ManyToOne

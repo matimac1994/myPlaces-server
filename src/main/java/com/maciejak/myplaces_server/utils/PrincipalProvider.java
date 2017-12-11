@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PrincipalProvider {
 
-    public User getUserEntity(){
+    public static User getUserEntity(){
         return ((CustomUserDetails) SecurityContextHolder
                     .getContext()
                     .getAuthentication()

@@ -30,7 +30,8 @@ public class UserServiceImpl implements UserService {
         validate(registrationRequest);
 
         User user = userRepository.save(new User(registrationRequest.getUsername(),
-                registrationRequest.getEmail(),registrationRequest.getPassword()));
+                registrationRequest.getEmail(),
+                passwordEncoder.encode(registrationRequest.getPassword())));
         registrationResponse.setUserId(user.getId());
         return registrationResponse;
     }
