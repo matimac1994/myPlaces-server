@@ -69,6 +69,12 @@
             <version>1.16.18</version>
             <scope>provided</scope>
         </dependency>
+		<dependency>
+			<!-- jsoup HTML parser library @ https://jsoup.org/ -->
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.11.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>

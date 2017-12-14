@@ -37,6 +37,7 @@ public class AuthConfig extends WebSecurityConfigurerAdapter{
                 .antMatchers(HttpMethod.OPTIONS, "/api/myplaces/**").permitAll()
                 .antMatchers("/api/myplaces/register").permitAll()
                 .antMatchers("/api/myplaces/login").permitAll()
+                .antMatchers("/api/myplaces/top/**").permitAll()
                 .anyRequest().hasAuthority(AppRoles.USER)
                 .and()
                 .exceptionHandling();

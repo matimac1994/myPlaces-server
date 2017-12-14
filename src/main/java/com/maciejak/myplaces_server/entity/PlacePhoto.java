@@ -10,12 +10,13 @@ public class PlacePhoto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    Long id;
+    private Long id;
 
     @Column
-    String image;
+    private String image;
 
     @ManyToOne
-    Place place;
+    @JoinColumn(name = "place_id")
+    private Place place;
 
 }
