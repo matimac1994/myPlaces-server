@@ -23,6 +23,6 @@ public class MyPlacesServerApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... strings) throws Exception {
-		topPlacesParser.fillTopPlaces();
+//		topPlacesParser.fillTopPlaces();
 	}
 }

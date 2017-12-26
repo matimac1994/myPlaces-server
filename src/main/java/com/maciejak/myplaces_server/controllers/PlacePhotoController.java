@@ -7,6 +7,7 @@ import com.maciejak.myplaces_server.services.PlacePhotoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -40,12 +41,24 @@ public class PlacePhotoController {
         return ResponseEntity.ok(placePhotoService.getPlacePhotoById(photoId));
     }
 
+    @PostMapping("/upload/{placeId}")
+    public ResponseEntity<Void> handlePhotoUpload(
+            @PathVariable("placeId") Long placeId,
+            @RequestParam("photo") MultipartFile photo){
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/upload", consumes = "multipart/form-data", method = RequestMethod.POST)
+    public ResponseEntity<PlacePhotoResponse> handlePhotoUpload(
+            @RequestParam("photo") MultipartFile photo){
+        return ResponseEntity.ok(placePhotoService.savePhoto(photo));
+    }
 
     @PostMapping("/delete")
     public ResponseEntity<Void> deletePhotosByIds(@RequestBody IdsRequest idsRequest){
         placePhotoService.deletePlacePhotosByIds(idsRequest);
         return ResponseEntity.ok().build();
-    }
+}
 
     @DeleteMapping("/delete/{photoId}")
     public ResponseEntity<Void> deletePhotoById(@PathVariable Long photoId){

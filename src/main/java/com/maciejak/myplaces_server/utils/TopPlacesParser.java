@@ -2,7 +2,6 @@ package com.maciejak.myplaces_server.utils;
 
 import com.maciejak.myplaces_server.entity.TopPlace;
 import com.maciejak.myplaces_server.entity.TopPlacePhoto;
-import com.maciejak.myplaces_server.repositories.TopPlaceRepository;
 import com.maciejak.myplaces_server.services.TopPlacesService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

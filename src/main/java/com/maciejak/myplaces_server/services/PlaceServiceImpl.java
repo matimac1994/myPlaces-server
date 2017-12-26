@@ -9,6 +9,7 @@ import com.maciejak.myplaces_server.api.dto.response.PlaceListResponse;
 import com.maciejak.myplaces_server.api.dto.response.PlaceResponse;
 import com.maciejak.myplaces_server.api.mappers.PlaceMapper;
 import com.maciejak.myplaces_server.entity.Place;
+import com.maciejak.myplaces_server.entity.PlacePhoto;
 import com.maciejak.myplaces_server.entity.User;
 import com.maciejak.myplaces_server.exception.place.*;
 import com.maciejak.myplaces_server.repositories.PlaceRepository;
@@ -16,22 +17,27 @@ import com.maciejak.myplaces_server.repositories.UserRepository;
 import com.maciejak.myplaces_server.utils.MapPhotoUtil;
 import com.maciejak.myplaces_server.utils.PrincipalProvider;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class PlaceServiceImpl implements PlaceService {
 
     private PlaceMapper placeMapper;
     private PlaceRepository placeRepository;
     private UserRepository userRepository;
+    private PlacePhotoService placePhotoService;
 
-    public PlaceServiceImpl(PlaceMapper placeMapper, PlaceRepository placeRepository, UserRepository userRepository) {
+    public PlaceServiceImpl(PlaceMapper placeMapper, PlaceRepository placeRepository, UserRepository userRepository, PlacePhotoService placePhotoService) {
         this.placeMapper = placeMapper;
         this.placeRepository = placeRepository;
         this.userRepository = userRepository;
+        this.placePhotoService = placePhotoService;
     }
 
     @Override
@@ -90,7 +96,7 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
-    public AddPlaceResponse addPlace(AddPlaceRequest addPlaceRequest) {
+    public AddPlaceResponse addPlace(AddPlaceRequest addPlaceRequest, MultipartFile[] uploadPhotos) {
         AddPlaceResponse addPlaceResponse = new AddPlaceResponse();
 
         User user = PrincipalProvider.getUserEntity();
@@ -102,6 +108,14 @@ public class PlaceServiceImpl implements PlaceService {
         Place place = placeMapper.addPlaceRequestToPlace(addPlaceRequest);
         place.setCreatedAt(System.currentTimeMillis());
         place.setUser(user);
+
+        List<PlacePhoto> photos = new ArrayList<>();
+
+        if (uploadPhotos != null && uploadPhotos.length > 0){
+            photos = placePhotoService.savePhotos(place, uploadPhotos);
+        }
+        place.setPhotos(photos);
+
         Place createdPlace = placeRepository.save(place);
 
         addPlaceResponse.setId(createdPlace.getId());

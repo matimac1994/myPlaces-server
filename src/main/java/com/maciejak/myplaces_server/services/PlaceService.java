@@ -7,6 +7,7 @@ import com.maciejak.myplaces_server.api.dto.response.AddPlaceResponse;
 import com.maciejak.myplaces_server.api.dto.response.PlaceMapResponse;
 import com.maciejak.myplaces_server.api.dto.response.PlaceListResponse;
 import com.maciejak.myplaces_server.api.dto.response.PlaceResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public interface PlaceService {
 
     PlaceResponse getPlaceById(Long placeId);
 
-    AddPlaceResponse addPlace(AddPlaceRequest addPlaceRequest);
+    AddPlaceResponse addPlace(AddPlaceRequest addPlaceRequest, MultipartFile[] uploadPhotos);
 
     void editPlace(EditPlaceRequest editPlaceRequest);
 

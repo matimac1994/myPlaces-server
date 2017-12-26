@@ -11,6 +11,7 @@ import com.maciejak.myplaces_server.services.PlaceService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -62,9 +63,12 @@ public class PlacesController {
     }
 
     @PostMapping("/add")
+    @RequestMapping(consumes = "multipart/form-data")
     @ResponseBody
-    public ResponseEntity<AddPlaceResponse> addPlace(@RequestBody AddPlaceRequest addPlaceRequest){
-        return ResponseEntity.ok(placeService.addPlace(addPlaceRequest));
+    public ResponseEntity<AddPlaceResponse> addPlace(
+            @RequestPart("addPlaceRequest") AddPlaceRequest addPlaceRequest,
+            @RequestPart MultipartFile[] uploadPhotos){
+        return ResponseEntity.ok(placeService.addPlace(addPlaceRequest, uploadPhotos));
     }
 
     @PostMapping("/edit")
