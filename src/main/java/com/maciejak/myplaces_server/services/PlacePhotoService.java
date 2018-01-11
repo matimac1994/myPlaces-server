@@ -17,6 +17,5 @@ public interface PlacePhotoService {
     void deletePlacePhotoById(Long photoId);
     void deletePlacePhotosByIds(IdsRequest idsRequest);
     List<PlacePhoto> savePhotos(Place place, MultipartFile[] photos);
-
     PlacePhotoResponse savePhoto(MultipartFile photo);
 }

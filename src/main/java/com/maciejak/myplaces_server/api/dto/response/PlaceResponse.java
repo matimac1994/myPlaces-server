@@ -1,7 +1,5 @@
 package com.maciejak.myplaces_server.api.dto.response;
 
-import com.maciejak.myplaces_server.entity.PlacePhoto;
-
 import java.util.List;
 
 public class PlaceResponse {
@@ -13,25 +11,14 @@ public class PlaceResponse {
     private String description;
     private String note;
     private String mapPhoto;
-    private Long createdAt;
-    private Long updatedAt;
-    private Long deletedAt;
-    private List<PlacePhoto> photos;
+    private String deletedAt;
+    private List<PlacePhotoResponse> photos;
 
     public PlaceResponse() {
     }
 
-    public PlaceResponse(Long id,
-                         Double latitude,
-                         Double longitude,
-                         String title,
-                         String description,
-                         String note,
-                         String mapPhoto,
-                         Long createdAt,
-                         Long updatedAt,
-                         Long deletedAt,
-                         List<PlacePhoto> photos) {
+    public PlaceResponse(Long id, Double latitude, Double longitude, String title, String description,
+                         String note, String mapPhoto, String deletedAt, List<PlacePhotoResponse> photos) {
         this.id = id;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -39,32 +26,8 @@ public class PlaceResponse {
         this.description = description;
         this.note = note;
         this.mapPhoto = mapPhoto;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
         this.deletedAt = deletedAt;
         this.photos = photos;
-    }
-
-    public PlaceResponse(Long id,
-                         Double latitude,
-                         Double longitude,
-                         String title,
-                         String description,
-                         String note,
-                         String mapPhoto,
-                         Long createdAt,
-                         Long updatedAt,
-                         Long deletedAt) {
-        this.id = id;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.title = title;
-        this.description = description;
-        this.note = note;
-        this.mapPhoto = mapPhoto;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.deletedAt = deletedAt;
     }
 
     public Long getId() {
@@ -123,35 +86,19 @@ public class PlaceResponse {
         this.mapPhoto = mapPhoto;
     }
 
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Long createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Long updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public Long getDeletedAt() {
+    public String getDeletedAt() {
         return deletedAt;
     }
 
-    public void setDeletedAt(Long deletedAt) {
+    public void setDeletedAt(String deletedAt) {
         this.deletedAt = deletedAt;
     }
 
-    public List<PlacePhoto> getPhotos() {
+    public List<PlacePhotoResponse> getPhotos() {
         return photos;
     }
 
-    public void setPhotos(List<PlacePhoto> photos) {
+    public void setPhotos(List<PlacePhotoResponse> photos) {
         this.photos = photos;
     }
 }

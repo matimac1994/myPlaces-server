@@ -1,16 +1,27 @@
-package com.maciejak.myplaces_server.services;
+package com.maciejak.myplaces_server.services.Impl;
 
 import com.maciejak.myplaces_server.api.dto.request.IdsRequest;
 import com.maciejak.myplaces_server.api.dto.response.PlacePhotoResponse;
 import com.maciejak.myplaces_server.api.mappers.PlacePhotoMapper;
 import com.maciejak.myplaces_server.entity.Place;
 import com.maciejak.myplaces_server.entity.PlacePhoto;
+import com.maciejak.myplaces_server.entity.User;
 import com.maciejak.myplaces_server.exception.place.PlacePhotoNotFoundException;
 import com.maciejak.myplaces_server.repositories.PlacePhotoRepository;
+import com.maciejak.myplaces_server.services.PlacePhotoService;
+import com.maciejak.myplaces_server.services.StorageService;
+import com.maciejak.myplaces_server.utils.PrincipalProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.Filter;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,13 +30,15 @@ import java.util.stream.Collectors;
 public class PlacePhotoServiceImpl implements PlacePhotoService {
 
     private PlacePhotoRepository placePhotoRepository;
+    private StorageService storageService;
     private PlacePhotoMapper placePhotoMapper;
-    private HttpServletRequest request;
 
-    public PlacePhotoServiceImpl(PlacePhotoRepository placePhotoRepository, PlacePhotoMapper placePhotoMapper, HttpServletRequest request) {
+    public PlacePhotoServiceImpl(PlacePhotoRepository placePhotoRepository,
+                                 StorageService storageService,
+                                 PlacePhotoMapper placePhotoMapper) {
         this.placePhotoRepository = placePhotoRepository;
+        this.storageService = storageService;
         this.placePhotoMapper = placePhotoMapper;
-        this.request = request;
     }
 
     @Override
@@ -62,6 +75,7 @@ public class PlacePhotoServiceImpl implements PlacePhotoService {
             throw new PlacePhotoNotFoundException();
         }
 
+        storageService.deletePhotoByPath(placePhoto.getPlacePhotoPath());
         placePhotoRepository.delete(placePhoto);
     }
 
@@ -74,12 +88,27 @@ public class PlacePhotoServiceImpl implements PlacePhotoService {
 
     @Override
     public PlacePhotoResponse savePhoto(MultipartFile photo) {
-        String filePath =request.getServletContext().getRealPath("/");
-        return new PlacePhotoResponse();
+        User user = PrincipalProvider.getUserEntity();
+        String filePath = storageService.store(photo);
+        File file = new File(filePath);
+        String fileUrl = storageService.createFileServerUrl(user.getId(), file.getName());
+
+        PlacePhoto placePhoto = createPlacePhoto(filePath, fileUrl);
+
+        return placePhotoMapper.placePhotoToPlaceResponse(placePhoto);
+    }
+
+    private PlacePhoto createPlacePhoto(String filePath, String fileUrl) {
+        PlacePhoto placePhoto = new PlacePhoto();
+        placePhoto.setPlacePhotoPath(filePath);
+        placePhoto.setPlacePhotoUrl(fileUrl);
+        placePhotoRepository.save(placePhoto);
+        return placePhoto;
     }
 
     @Override
     public List<PlacePhoto> savePhotos(Place place, MultipartFile[] photos) {
         return null;
     }
+
 }

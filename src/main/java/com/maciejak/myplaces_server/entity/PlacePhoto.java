@@ -13,7 +13,10 @@ public class PlacePhoto {
     private Long id;
 
     @Column
-    private String image;
+    private String placePhotoUrl;
+
+    @Column
+    private String placePhotoPath;
 
     @ManyToOne
     @JoinColumn(name = "place_id")
@@ -27,12 +30,20 @@ public class PlacePhoto {
         this.id = id;
     }
 
-    public String getImage() {
-        return image;
+    public String getPlacePhotoUrl() {
+        return placePhotoUrl;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setPlacePhotoUrl(String placePhotoUrl) {
+        this.placePhotoUrl = placePhotoUrl;
+    }
+
+    public String getPlacePhotoPath() {
+        return placePhotoPath;
+    }
+
+    public void setPlacePhotoPath(String placePhotoPath) {
+        this.placePhotoPath = placePhotoPath;
     }
 
     public Place getPlace() {

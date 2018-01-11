@@ -1,11 +1,9 @@
-package com.maciejak.myplaces_server.security;
+package com.maciejak.myplaces_server.config.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -22,8 +20,6 @@ import org.springframework.session.web.http.HeaderHttpSessionStrategy;
 import org.springframework.session.web.http.HttpSessionStrategy;
 import org.springframework.session.web.http.SessionRepositoryFilter;
 
-import java.util.Arrays;
-
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -37,6 +33,7 @@ public class AuthConfig extends WebSecurityConfigurerAdapter{
                 .antMatchers(HttpMethod.OPTIONS, "/api/myplaces/**").permitAll()
                 .antMatchers("/api/myplaces/register").permitAll()
                 .antMatchers("/api/myplaces/login").permitAll()
+                .antMatchers("/api/myplaces/photo/**").permitAll()
                 .anyRequest().hasAuthority(AppRoles.USER)
                 .and()
                 .exceptionHandling();

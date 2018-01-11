@@ -1,25 +1,27 @@
-package com.maciejak.myplaces_server.services;
+package com.maciejak.myplaces_server.services.Impl;
 
 import com.maciejak.myplaces_server.api.dto.request.AddPlaceRequest;
 import com.maciejak.myplaces_server.api.dto.request.EditPlaceRequest;
 import com.maciejak.myplaces_server.api.dto.request.IdsRequest;
-import com.maciejak.myplaces_server.api.dto.response.AddPlaceResponse;
-import com.maciejak.myplaces_server.api.dto.response.PlaceMapResponse;
-import com.maciejak.myplaces_server.api.dto.response.PlaceListResponse;
-import com.maciejak.myplaces_server.api.dto.response.PlaceResponse;
+import com.maciejak.myplaces_server.api.dto.response.*;
 import com.maciejak.myplaces_server.api.mappers.PlaceMapper;
 import com.maciejak.myplaces_server.entity.Place;
 import com.maciejak.myplaces_server.entity.PlacePhoto;
 import com.maciejak.myplaces_server.entity.User;
 import com.maciejak.myplaces_server.exception.place.*;
+import com.maciejak.myplaces_server.repositories.PlacePhotoRepository;
 import com.maciejak.myplaces_server.repositories.PlaceRepository;
 import com.maciejak.myplaces_server.repositories.UserRepository;
+import com.maciejak.myplaces_server.services.PlacePhotoService;
+import com.maciejak.myplaces_server.services.PlaceService;
+import com.maciejak.myplaces_server.services.StorageService;
 import com.maciejak.myplaces_server.utils.MapPhotoUtil;
 import com.maciejak.myplaces_server.utils.PrincipalProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,42 +32,47 @@ public class PlaceServiceImpl implements PlaceService {
 
     private PlaceMapper placeMapper;
     private PlaceRepository placeRepository;
+    private PlacePhotoRepository placePhotoRepository;
     private UserRepository userRepository;
-    private PlacePhotoService placePhotoService;
+    private StorageService storageService;
 
-    public PlaceServiceImpl(PlaceMapper placeMapper, PlaceRepository placeRepository, UserRepository userRepository, PlacePhotoService placePhotoService) {
+    public PlaceServiceImpl(PlaceMapper placeMapper, PlaceRepository placeRepository,
+                            PlacePhotoRepository placePhotoRepository,
+                            UserRepository userRepository,
+                            StorageService storageService) {
         this.placeMapper = placeMapper;
         this.placeRepository = placeRepository;
+        this.placePhotoRepository = placePhotoRepository;
         this.userRepository = userRepository;
-        this.placePhotoService = placePhotoService;
+        this.storageService = storageService;
     }
 
     @Override
     public List<PlaceResponse> getAllPlaces() {
         User u = PrincipalProvider.getUserEntity();
-        User user = userRepository.findOne(u.getId());
-        return fillListOfPlaceResponse(user.getPlaces());
+        List<Place> places = placeRepository.findAllByUser(u);
+        return fillListOfPlaceResponse(places);
     }
 
     @Override
     public List<PlaceResponse> getAllActivePlaces() {
         User u = PrincipalProvider.getUserEntity();
-        User user = userRepository.findOne(u.getId());
-        return fillListOfPlaceResponse(user.getActivePlaces());
+        List<Place> places = placeRepository.findAllActive(u.getId());
+        return fillListOfPlaceResponse(places);
     }
 
     @Override
     public List<PlaceResponse> getAllArchivedPlaces() {
         User u = PrincipalProvider.getUserEntity();
-        User user = userRepository.findOne(u.getId());
-        return fillListOfPlaceResponse(user.getArchivePlaces());
+        List<Place> places = placeRepository.findAllArchived(u.getId());
+        return fillListOfPlaceResponse(places);
     }
 
     @Override
     public List<PlaceMapResponse> getAllMapPlaces() {
         User u = PrincipalProvider.getUserEntity();
-        User user = userRepository.findOne(u.getId());
-        return user.getActivePlaces()
+        List<Place> places = placeRepository.findAllActive(u.getId());
+        return places
                 .stream()
                 .map(placeMapper::placeToMapPlaceResponse)
                 .collect(Collectors.toList());
@@ -74,15 +81,15 @@ public class PlaceServiceImpl implements PlaceService {
     @Override
     public List<PlaceListResponse> getAllActivePlacesList() {
         User u = PrincipalProvider.getUserEntity();
-        User user = userRepository.findOne(u.getId());
-        return fillListOfPlaceListResponse(user.getActivePlaces());
+        List<Place> places = placeRepository.findAllActive(u.getId());
+        return fillListOfPlaceListResponse(places);
     }
 
     @Override
     public List<PlaceListResponse> getAllArchivedPlaceList() {
         User u = PrincipalProvider.getUserEntity();
-        User user = userRepository.findOne(u.getId());
-        return fillListOfPlaceListResponse(user.getArchivePlaces());
+        List<Place> places = placeRepository.findAllArchived(u.getId());
+        return fillListOfPlaceListResponse(places);
     }
 
     @Override
@@ -96,7 +103,7 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
-    public AddPlaceResponse addPlace(AddPlaceRequest addPlaceRequest, MultipartFile[] uploadPhotos) {
+    public AddPlaceResponse addPlace(AddPlaceRequest addPlaceRequest) {
         AddPlaceResponse addPlaceResponse = new AddPlaceResponse();
 
         User user = PrincipalProvider.getUserEntity();
@@ -109,17 +116,23 @@ public class PlaceServiceImpl implements PlaceService {
         place.setCreatedAt(System.currentTimeMillis());
         place.setUser(user);
 
-        List<PlacePhoto> photos = new ArrayList<>();
-
-        if (uploadPhotos != null && uploadPhotos.length > 0){
-            photos = placePhotoService.savePhotos(place, uploadPhotos);
-        }
-        place.setPhotos(photos);
+        addPlacePhotosToPlace(place, addPlaceRequest);
 
         Place createdPlace = placeRepository.save(place);
 
         addPlaceResponse.setId(createdPlace.getId());
         return addPlaceResponse;
+    }
+
+    private void addPlacePhotosToPlace(Place place, AddPlaceRequest addPlaceRequest) {
+        if (addPlaceRequest.getPlacePhotosIds() != null
+                && addPlaceRequest.getPlacePhotosIds().size() > 0){
+            List<PlacePhoto> photos = placePhotoRepository.findAll(addPlaceRequest.getPlacePhotosIds());
+            if (photos != null){
+                place.setPhotos(photos);
+                photos.forEach(placePhoto -> placePhoto.setPlace(place));
+            }
+        }
     }
 
     @Override
@@ -132,6 +145,7 @@ public class PlaceServiceImpl implements PlaceService {
         place.setTitle(editPlaceRequest.getTitle());
         place.setDescription(editPlaceRequest.getDescription());
         place.setNote(editPlaceRequest.getNote());
+        manageEditedPlacePhotos(place, editPlaceRequest.getPhotos());
         placeRepository.save(place);
 
     }
@@ -142,8 +156,10 @@ public class PlaceServiceImpl implements PlaceService {
         if (place == null) {
             throw new PlaceNotFoundException();
         }
-
-        placeRepository.delete(place.getId());
+        List<PlacePhoto> photos = place.getPhotos();
+        photos.forEach(placePhoto -> storageService.deletePhotoByPath(placePhoto.getPlacePhotoPath()));
+        placePhotoRepository.delete(photos);
+        placeRepository.delete(place);
     }
 
     @Override
@@ -223,5 +239,25 @@ public class PlaceServiceImpl implements PlaceService {
         PlaceListResponse placeListResponse = placeMapper.placeToPlaceListResponse(place);
         placeListResponse.setMapPhoto(new MapPhotoUtil(place.getLatitude(), place.getLongitude()).createUrlForMapImage());
         return placeListResponse;
+    }
+
+    private void manageEditedPlacePhotos(Place place, List<PlacePhotoResponse> photos) {
+        List<PlacePhoto> placePhotos = place.getPhotos();
+        List<Long> idsOfPhotosFromRequest = photos.stream().map(PlacePhotoResponse::getId).collect(Collectors.toList());
+        List<PlacePhoto> placePhotosFromRequest = placePhotoRepository.findAll(idsOfPhotosFromRequest);
+
+        for (PlacePhoto placePhoto : placePhotosFromRequest){
+            if (placePhoto.getPlace() == null){
+                placePhoto.setPlace(place);
+            }
+        }
+
+        for (PlacePhoto placePhoto : placePhotos){
+            if (!placePhotosFromRequest.contains(placePhoto)){
+                storageService.deletePhotoByPath(placePhoto.getPlacePhotoPath());
+                placePhotoRepository.delete(placePhoto);
+            }
+        }
+        place.setPhotos(placePhotosFromRequest);
     }
 }

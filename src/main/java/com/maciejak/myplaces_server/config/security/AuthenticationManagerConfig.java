@@ -1,4 +1,4 @@
-package com.maciejak.myplaces_server.security;
+package com.maciejak.myplaces_server.config.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

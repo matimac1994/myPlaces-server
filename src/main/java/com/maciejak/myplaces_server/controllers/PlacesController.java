@@ -63,12 +63,10 @@ public class PlacesController {
     }
 
     @PostMapping("/add")
-    @RequestMapping(consumes = "multipart/form-data")
     @ResponseBody
     public ResponseEntity<AddPlaceResponse> addPlace(
-            @RequestPart("addPlaceRequest") AddPlaceRequest addPlaceRequest,
-            @RequestPart MultipartFile[] uploadPhotos){
-        return ResponseEntity.ok(placeService.addPlace(addPlaceRequest, uploadPhotos));
+            @RequestBody AddPlaceRequest addPlaceRequest){
+        return ResponseEntity.ok(placeService.addPlace(addPlaceRequest));
     }
 
     @PostMapping("/edit")

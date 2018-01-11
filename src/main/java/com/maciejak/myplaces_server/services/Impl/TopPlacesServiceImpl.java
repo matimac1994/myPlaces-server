@@ -1,4 +1,4 @@
-package com.maciejak.myplaces_server.services;
+package com.maciejak.myplaces_server.services.Impl;
 
 import com.maciejak.myplaces_server.api.dto.response.TopPlaceResponse;
 import com.maciejak.myplaces_server.api.dto.response.TopPlaceResponseList;
@@ -8,6 +8,7 @@ import com.maciejak.myplaces_server.entity.TopPlacePhoto;
 import com.maciejak.myplaces_server.exception.place.PlaceNotFoundException;
 import com.maciejak.myplaces_server.repositories.TopPlacePhotoRepository;
 import com.maciejak.myplaces_server.repositories.TopPlaceRepository;
+import com.maciejak.myplaces_server.services.TopPlacesService;
 import com.maciejak.myplaces_server.utils.TopPlacesParser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -14,30 +14,17 @@ import java.util.List;
 public interface PlaceService {
 
     List<PlaceResponse> getAllPlaces();
-
     List<PlaceResponse> getAllActivePlaces();
-
     List<PlaceResponse> getAllArchivedPlaces();
-
     List<PlaceMapResponse> getAllMapPlaces();
-
     List<PlaceListResponse> getAllActivePlacesList();
-
     List<PlaceListResponse> getAllArchivedPlaceList();
-
     PlaceResponse getPlaceById(Long placeId);
-
-    AddPlaceResponse addPlace(AddPlaceRequest addPlaceRequest, MultipartFile[] uploadPhotos);
-
+    AddPlaceResponse addPlace(AddPlaceRequest addPlaceRequest);
     void editPlace(EditPlaceRequest editPlaceRequest);
-
     void deletePlace(Long placeId);
-
     void restorePlace(Long placeId);
-
     void restorePlaces(IdsRequest idsRequest);
-
     void deletePlaces(IdsRequest idsRequest);
-
     void archivePlace(Long placeId);
 }

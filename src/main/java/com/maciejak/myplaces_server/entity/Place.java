@@ -11,36 +11,16 @@ public class Place {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
-
-    @Column
-    String title;
-
-    @Column
-    Double latitude;
-
-    @Column
-    Double longitude;
-
-    @Column
-    String description;
-
-    @Column
-    String note;
-
-    @Column
-    Long createdAt;
-
-    @Column
-    Long updatedAt;
-
-    @Column
-    Long deletedAt;
-
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "place")
-    List<PlacePhoto> photos;
-
-    @ManyToOne
-    User user;
+    @Column String title;
+    @Column Double latitude;
+    @Column Double longitude;
+    @Column(length = 10000) String description;
+    @Column(length = 10000) String note;
+    @Column Long createdAt;
+    @Column Long updatedAt;
+    @Column Long deletedAt;
+    @OneToMany(mappedBy = "place") List<PlacePhoto> photos;
+    @ManyToOne User user;
 
     public Long getId() {
         return id;

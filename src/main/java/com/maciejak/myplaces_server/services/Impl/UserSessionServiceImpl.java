@@ -1,7 +1,8 @@
-package com.maciejak.myplaces_server.services;
+package com.maciejak.myplaces_server.services.Impl;
 
 import com.maciejak.myplaces_server.api.dto.request.LoginRequest;
 import com.maciejak.myplaces_server.api.dto.response.LoginResponse;
+import com.maciejak.myplaces_server.services.UserSessionService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

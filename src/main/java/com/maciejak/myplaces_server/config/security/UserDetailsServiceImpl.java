@@ -1,4 +1,4 @@
-package com.maciejak.myplaces_server.security;
+package com.maciejak.myplaces_server.config.security;
 
 import com.maciejak.myplaces_server.entity.User;
 import com.maciejak.myplaces_server.services.UserService;

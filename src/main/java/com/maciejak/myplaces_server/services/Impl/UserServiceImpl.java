@@ -1,4 +1,4 @@
-package com.maciejak.myplaces_server.services;
+package com.maciejak.myplaces_server.services.Impl;
 
 import com.maciejak.myplaces_server.api.dto.request.RegistrationRequest;
 import com.maciejak.myplaces_server.api.dto.response.RegistrationResponse;
@@ -8,6 +8,7 @@ import com.maciejak.myplaces_server.exception.user.NotTheSamePasswordException;
 import com.maciejak.myplaces_server.exception.user.UserNotFoundException;
 import com.maciejak.myplaces_server.exception.user.UsernameAlreadyExistException;
 import com.maciejak.myplaces_server.repositories.UserRepository;
+import com.maciejak.myplaces_server.services.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -59,11 +60,4 @@ public class UserServiceImpl implements UserService {
             throw new NotTheSamePasswordException();
         }
     }
-
-//    private boolean validateEmail(String email){
-//        if (email == null) return false;
-//        boolean result = true;
-//        try {
-//        }
-//    }
 }

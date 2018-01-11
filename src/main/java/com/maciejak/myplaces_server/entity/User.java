@@ -23,7 +23,7 @@ public class User {
     @Column
     String password;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user")
+    @OneToMany(mappedBy = "user")
     List<Place> places;
 
     public User() {
