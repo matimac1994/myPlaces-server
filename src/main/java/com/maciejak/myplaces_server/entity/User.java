@@ -23,7 +23,7 @@ public class User {
     @Column
     String password;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<Place> places;
 
     public User() {

@@ -24,17 +24,18 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class PlaceServiceImpl implements PlaceService {
 
-    private PlaceMapper placeMapper;
-    private PlaceRepository placeRepository;
-    private PlacePhotoRepository placePhotoRepository;
-    private UserRepository userRepository;
-    private StorageService storageService;
+    private final PlaceMapper placeMapper;
+    private final PlaceRepository placeRepository;
+    private final PlacePhotoRepository placePhotoRepository;
+    private final UserRepository userRepository;
+    private final StorageService storageService;
 
     public PlaceServiceImpl(PlaceMapper placeMapper, PlaceRepository placeRepository,
                             PlacePhotoRepository placePhotoRepository,
@@ -94,12 +95,7 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Override
     public PlaceResponse getPlaceById(Long placeId) {
-        Place place = placeRepository.findById(placeId);
-        if (place == null){
-            throw new PlaceNotFoundException();
-        }
-
-        return convertToPlaceResponse(place);
+        return convertToPlaceResponse(findByIdOrThrow(placeId));
     }
 
     @Override
@@ -127,7 +123,7 @@ public class PlaceServiceImpl implements PlaceService {
     private void addPlacePhotosToPlace(Place place, AddPlaceRequest addPlaceRequest) {
         if (addPlaceRequest.getPlacePhotosIds() != null
                 && addPlaceRequest.getPlacePhotosIds().size() > 0){
-            List<PlacePhoto> photos = placePhotoRepository.findAll(addPlaceRequest.getPlacePhotosIds());
+            List<PlacePhoto> photos = placePhotoRepository.findAllById(addPlaceRequest.getPlacePhotosIds());
             if (photos != null){
                 place.setPhotos(photos);
                 photos.forEach(placePhoto -> placePhoto.setPlace(place));
@@ -137,10 +133,7 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Override
     public void editPlace(EditPlaceRequest editPlaceRequest) {
-        Place place = placeRepository.findById(editPlaceRequest.getId());
-        if (place == null){
-            throw new PlaceNotFoundException();
-        }
+        Place place = findByIdOrThrow(editPlaceRequest.getId());
 
         place.setTitle(editPlaceRequest.getTitle());
         place.setDescription(editPlaceRequest.getDescription());
@@ -152,23 +145,17 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Override
     public void deletePlace(Long placeId) {
-        Place place = placeRepository.findById(placeId);
-        if (place == null) {
-            throw new PlaceNotFoundException();
-        }
+        Place place = findByIdOrThrow(placeId);
+
         List<PlacePhoto> photos = place.getPhotos();
         photos.forEach(placePhoto -> storageService.deletePhotoByPath(placePhoto.getPlacePhotoPath()));
-        placePhotoRepository.delete(photos);
+        placePhotoRepository.deleteAll(photos);
         placeRepository.delete(place);
     }
 
     @Override
     public void restorePlace(Long placeId) {
-        Place place = placeRepository.findById(placeId);
-        if (place == null){
-            throw new PlaceNotFoundException();
-        }
-
+        Place place = findByIdOrThrow(placeId);
         if (place.getDeletedAt() == null){
             throw new PlaceIsNotArchivedException();
         }
@@ -198,17 +185,22 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Override
     public void archivePlace(Long placeId) {
-        Place place = placeRepository.findById(placeId);
-        if (place == null){
-            throw new PlaceNotFoundException();
-        }
-
+        Place place = findByIdOrThrow(placeId);
         if (place.getDeletedAt() != null){
             throw new PlaceIsAlreadyArchivedException();
         }
 
         place.setDeletedAt(System.currentTimeMillis());
         placeRepository.save(place);
+    }
+
+    private Place findByIdOrThrow(Long placeId){
+        Optional<Place> placeOptional = placeRepository.findById(placeId);
+        if (!placeOptional.isPresent()){
+            throw new PlaceNotFoundException();
+        }
+
+        return placeOptional.get();
     }
 
     private List<PlaceResponse> fillListOfPlaceResponse(List<Place> places){
@@ -244,7 +236,7 @@ public class PlaceServiceImpl implements PlaceService {
     private void manageEditedPlacePhotos(Place place, List<PlacePhotoResponse> photos) {
         List<PlacePhoto> placePhotos = place.getPhotos();
         List<Long> idsOfPhotosFromRequest = photos.stream().map(PlacePhotoResponse::getId).collect(Collectors.toList());
-        List<PlacePhoto> placePhotosFromRequest = placePhotoRepository.findAll(idsOfPhotosFromRequest);
+        List<PlacePhoto> placePhotosFromRequest = placePhotoRepository.findAllById(idsOfPhotosFromRequest);
 
         for (PlacePhoto placePhoto : placePhotosFromRequest){
             if (placePhoto.getPlace() == null){

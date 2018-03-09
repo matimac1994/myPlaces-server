@@ -8,6 +8,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
+import java.util.Optional;
+
 @SpringBootApplication
 @EnableConfigurationProperties(StorageProperties.class)
 public class MyPlacesServerApplication implements CommandLineRunner {
@@ -26,6 +28,6 @@ public class MyPlacesServerApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... strings) throws Exception {
-		topPlacesParser.fillTopPlaces();
+//		topPlacesParser.fillTopPlaces();
 	}
 }

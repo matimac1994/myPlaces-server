@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -46,12 +47,12 @@ public class TopPlacesServiceImpl implements TopPlacesService {
 
     @Override
     public TopPlaceResponse getTopPlaceById(Long topPlaceId) {
-        TopPlace topPlace = topPlaceRepository.findOne(topPlaceId);
-        if (topPlace == null){
+        Optional<TopPlace> topPlaceOptional = topPlaceRepository.findById(topPlaceId);
+        if (!topPlaceOptional.isPresent()){
             throw new PlaceNotFoundException();
         }
 
-        return topPlaceMapper.topPlaceToTopPlaceResponse(topPlace);
+        return topPlaceMapper.topPlaceToTopPlaceResponse(topPlaceOptional.get());
     }
 
     @Override
@@ -61,7 +62,7 @@ public class TopPlacesServiceImpl implements TopPlacesService {
 
     @Override
     public void save(List<TopPlace> topPlaces) {
-        topPlaceRepository.save(topPlaces);
+        topPlaceRepository.saveAll(topPlaces);
     }
 
     @Override

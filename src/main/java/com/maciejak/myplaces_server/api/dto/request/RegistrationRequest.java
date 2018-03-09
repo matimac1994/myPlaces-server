@@ -1,34 +1,34 @@
 package com.maciejak.myplaces_server.api.dto.request;
 
 
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Column;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 public class RegistrationRequest {
 
     @NotNull(message = "Username is required")
-    @NotBlank(message = "Username is required")
+    @NotEmpty(message = "Username is required")
     @Size(min = 3, max = 20, message = "Username must have length between 3-20")
     @Column(unique = true)
     private String username;
 
     @NotNull(message = "Email is required")
-    @NotBlank(message = "Email is required")
+    @NotEmpty(message = "Email is required")
     @Email(message = "Type valid email address")
     @Column(unique = true)
     private String email;
 
     @NotNull(message = "Password is required")
-    @NotBlank(message = "Password is required")
+    @NotEmpty(message = "Password is required")
     @Size(min = 3, max = 20, message = "Password must have length between 3-20")
     private String password;
 
     @NotNull(message = "Confirm password is required")
-    @NotBlank(message = "Confirm password is required")
+    @NotEmpty(message = "Confirm password is required")
     private String confirmPassword;
 
     public RegistrationRequest() {

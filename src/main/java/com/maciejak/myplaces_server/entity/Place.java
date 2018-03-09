@@ -19,7 +19,7 @@ public class Place {
     @Column Long createdAt;
     @Column Long updatedAt;
     @Column Long deletedAt;
-    @OneToMany(mappedBy = "place") List<PlacePhoto> photos;
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL) List<PlacePhoto> photos;
     @ManyToOne User user;
 
     public Long getId() {

@@ -6,10 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PlaceRepository extends JpaRepository<Place, Long> {
-    Place findById(Long placeId);
-
     @Query("select p from Place p where p.deletedAt is null and p.user.id = ?1")
     List<Place> findAllActive(Long userId);
 

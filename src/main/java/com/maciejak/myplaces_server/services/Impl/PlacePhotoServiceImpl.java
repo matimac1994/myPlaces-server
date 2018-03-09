@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,11 +52,7 @@ public class PlacePhotoServiceImpl implements PlacePhotoService {
 
     @Override
     public PlacePhotoResponse getPlacePhotoById(Long photoId) {
-        PlacePhoto placePhoto = placePhotoRepository.findOne(photoId);
-        if (placePhoto == null){
-            throw new PlacePhotoNotFoundException();
-        }
-        return placePhotoMapper.placePhotoToPlaceResponse(placePhoto);
+        return placePhotoMapper.placePhotoToPlaceResponse(findPlacePhotoByIdOrThrow(photoId));
     }
 
     @Override
@@ -69,11 +66,7 @@ public class PlacePhotoServiceImpl implements PlacePhotoService {
 
     @Override
     public void deletePlacePhotoById(Long photoId) {
-        PlacePhoto placePhoto = placePhotoRepository.findOne(photoId);
-
-        if (placePhoto == null){
-            throw new PlacePhotoNotFoundException();
-        }
+        PlacePhoto placePhoto = findPlacePhotoByIdOrThrow(photoId);
 
         storageService.deletePhotoByPath(placePhoto.getPlacePhotoPath());
         placePhotoRepository.delete(placePhoto);
@@ -104,6 +97,15 @@ public class PlacePhotoServiceImpl implements PlacePhotoService {
         placePhoto.setPlacePhotoUrl(fileUrl);
         placePhotoRepository.save(placePhoto);
         return placePhoto;
+    }
+
+    private PlacePhoto findPlacePhotoByIdOrThrow(Long photoId){
+        Optional<PlacePhoto> placePhotoOptional = placePhotoRepository.findById(photoId);
+        if (!placePhotoOptional.isPresent()){
+            throw new PlacePhotoNotFoundException();
+        }
+
+        return placePhotoOptional.get();
     }
 
     @Override

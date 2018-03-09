@@ -18,8 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 @Service
 public class UserSessionServiceImpl implements UserSessionService {
 
-    private AuthenticationManager authenticationManager;
-    private PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
 
     public UserSessionServiceImpl(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
